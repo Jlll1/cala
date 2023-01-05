@@ -31,7 +31,7 @@ newCalaProcess() {
   local calaId=$2
   local command="$3"
 
-  local processPath="${CALAPATH}/${calaId}"
+  local processPath="${CALAPATH}/${calaId}.cala"
   if [ -e $processPath ]; then
     echo "process with calaId $calaId already exists"
     exit 1
@@ -39,7 +39,7 @@ newCalaProcess() {
 
 cat << EOT > $processPath
 status: New
-PID: ?
+pid: ?
 command: '$command'
 EOT
 
@@ -50,7 +50,7 @@ setProcessStatus() {
   local calaId=$1
   local newStatus=$2
 
-  local process="${CALAPATH}/${calaId}"
+  local process="${CALAPATH}/${calaId}.cala"
   if [ ! -e $process ]; then
     echo "process with calaId $calaId does not exist"
     exit 1
@@ -63,13 +63,13 @@ setProcessPid() {
   local calaId=$1
   local newPid=$2
 
-  local process="${CALAPATH}/${calaId}"
+  local process="${CALAPATH}/${calaId}.cala"
   if [ ! -e $process ]; then
     echo "process with calaId $calaId does not exist"
     exit 1
   fi
 
-  sed -i "2c\PID: $newPid" $process
+  sed -i "2c\pid: $newPid" $process
 }
 
 command_add() {
@@ -88,9 +88,26 @@ command_add() {
   setProcessPid $calaId $pid
 }
 
+command_list() {
+  local list=$"CalaId|Status|Command\n\n"
+
+  for f in ~/.cala/*.cala; do
+    local calaId=$(basename $f .cala)
+    local status=$(sed "1q;d" $f | cut -f 2- -d ' ')
+    local command=$(sed "3q;d" $f | cut -f 2- -d ' ')
+    list+=$"$calaId|$status|$command\n"
+  done
+
+  printf "$list" | column -t -s '|' -o ' | '
+}
+
 case $1 in
 add)
 command_add "$2"
+;;
+
+list)
+command_list
 ;;
 
 *)
