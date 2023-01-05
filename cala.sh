@@ -28,8 +28,9 @@ getCalaId() {
 
 newCalaProcess() {
   declare -n _out=$1
-
   local calaId=$2
+  local command="$3"
+
   local processPath="${CALAPATH}/${calaId}"
   if [ -e $processPath ]; then
     echo "process with calaId $calaId already exists"
@@ -39,6 +40,7 @@ newCalaProcess() {
 cat << EOT > $processPath
 status: New
 PID: ?
+command: '$command'
 EOT
 
   _out=$processPath
@@ -70,15 +72,17 @@ setProcessPid() {
   sed -i "2c\PID: $newPid" $process
 }
 
-add() {
+command_add() {
+  local command="$1"
+
   local calaId
   getCalaId calaId
 
   local process
-  newCalaProcess process $calaId
+  newCalaProcess process $calaId "$command"
 
   setProcessStatus $calaId "Active"
-  bash -c $1 >> "${process}.output" && setProcessStatus $calaId "Completed" &
+  bash -c "$command" >> "${process}.output" && setProcessStatus $calaId "Completed" &
   echo "cala process $calaId started"
   pid=$!
   setProcessPid $calaId $pid
@@ -86,7 +90,7 @@ add() {
 
 case $1 in
 add)
-add $2
+command_add "$2"
 ;;
 
 *)
