@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CALAPATH=~/.cala
+CALAPATH=$HOME/.cala
 
 usage() {
   echo "cala"
@@ -14,6 +14,8 @@ ensurePath() {
 
 getCalaId() {
   declare -n _out=$1
+
+  ensurePath
 
   local idPath=${CALAPATH}/.id
   if [ ! -e $idPath ]; then
@@ -30,6 +32,8 @@ newCalaProcess() {
   declare -n _out=$1
   local calaId=$2
   local command="$3"
+
+  ensurePath
 
   local processPath="${CALAPATH}/${calaId}.cala"
   if [ -e $processPath ]; then
@@ -100,6 +104,7 @@ command_list() {
 
   printf "$list" | column -t -s '|' -o ' | '
 }
+
 
 case $1 in
 add)
