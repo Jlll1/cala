@@ -98,8 +98,13 @@ command_list() {
   for f in ~/.cala/*.cala; do
     local calaId=$(basename $f .cala)
     local status=$(sed "1q;d" $f | cut -f 2- -d ' ')
+    local pid=$(sed "2q;d" $f | cut -f 2- -d ' ')
     local command=$(sed "3q;d" $f | cut -f 2- -d ' ')
     list+=$"$calaId|$status|$command\n"
+
+    if ! ps -p $pid > /dev/null && [ status ~= "Completed" ]; then
+      echo "dupa"
+    fi
   done
 
   printf "$list" | column -t -s '|' -o ' | '
