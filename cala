@@ -31,52 +31,52 @@ getCalaId() {
   _out=$id
 }
 
-newCalaProcess() {
+newCalaTask() {
   declare -n _out=$1
   local calaId=$2
   local command="$3"
 
   ensurePath
 
-  local processPath="${CALAPATH}/${calaId}.cala"
-  if [ -e $processPath ]; then
-    echo "process with calaId $calaId already exists"
+  local taskPath="${CALAPATH}/${calaId}.cala"
+  if [ -e $taskPath ]; then
+    echo "task with calaId $calaId already exists"
     exit 1
   fi
 
-cat << EOT > $processPath
+cat << EOT > $taskPath
 status: New
 pid: ?
 command: '$command'
 EOT
 
-  _out=$processPath
+  _out=$taskPath
 }
 
-setProcessStatus() {
+setTaskStatus() {
   local calaId=$1
   local newStatus=$2
 
-  local process="${CALAPATH}/${calaId}.cala"
-  if [ ! -e $process ]; then
-    echo "process with calaId $calaId does not exist"
+  local task="${CALAPATH}/${calaId}.cala"
+  if [ ! -e $task ]; then
+    echo "task with calaId $calaId does not exist"
     exit 1
   fi
 
-  sed -i "1c\status: $newStatus" $process
+  sed -i "1c\status: $newStatus" $task
 }
 
-setProcessPid() {
+setTaskPid() {
   local calaId=$1
   local newPid=$2
 
-  local process="${CALAPATH}/${calaId}.cala"
-  if [ ! -e $process ]; then
-    echo "process with calaId $calaId does not exist"
+  local task="${CALAPATH}/${calaId}.cala"
+  if [ ! -e $task ]; then
+    echo "task with calaId $calaId does not exist"
     exit 1
   fi
 
-  sed -i "2c\pid: $newPid" $process
+  sed -i "2c\pid: $newPid" $task
 }
 
 command_add() {
@@ -85,14 +85,14 @@ command_add() {
   local calaId
   getCalaId calaId
 
-  local process
-  newCalaProcess process $calaId "$command"
+  local task
+  newCalaTask task $calaId "$command"
 
-  setProcessStatus $calaId "Active"
-  bash -c "$command" >> "${process}.output" && setProcessStatus $calaId "Completed" &
+  setTaskStatus $calaId "Active"
+  bash -c "$command" >> "${task}.output" && setTaskStatus $calaId "Completed" &
   echo $calaId
   pid=$!
-  setProcessPid $calaId $pid
+  setTaskPid $calaId $pid
 }
 
 command_list() {
@@ -110,7 +110,7 @@ command_list() {
     if [[ $status == "Active" ]] && ! ps -p $pid > /dev/null
     then
       status="Error"
-      setProcessStatus $calaId $status
+      setTaskStatus $calaId $status
     fi
 
     list+=$"$calaId|$status|$command\n"
