@@ -90,7 +90,7 @@ command_add() {
 
   setProcessStatus $calaId "Active"
   bash -c "$command" >> "${process}.output" && setProcessStatus $calaId "Completed" &
-  echo "cala process $calaId started"
+  echo $calaId
   pid=$!
   setProcessPid $calaId $pid
 }
