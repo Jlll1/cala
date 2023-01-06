@@ -100,11 +100,17 @@ command_list() {
     local status=$(sed "1q;d" $f | cut -f 2- -d ' ')
     local pid=$(sed "2q;d" $f | cut -f 2- -d ' ')
     local command=$(sed "3q;d" $f | cut -f 2- -d ' ')
-    list+=$"$calaId|$status|$command\n"
 
-    if ! ps -p $pid > /dev/null && [ status ~= "Completed" ]; then
-      echo "dupa"
+    # if a process with given pid does not exist and its status is not completed
+    # that means that the process was terminated but cala was not aware of it
+    # so we set the status to Error
+    if [[ $status == "Active" ]] && ! ps -p $pid > /dev/null
+    then
+      status="Error"
+      setProcessStatus $calaId $status
     fi
+
+    list+=$"$calaId|$status|$command\n"
   done
 
   printf "$list" | column -t -s '|' -o ' | '
