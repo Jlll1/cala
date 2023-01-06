@@ -17,7 +17,7 @@ sudo make install
 ## Usage
 Cala provides two commands:
 * `add <command>` - Executes `<command>` and starts tracking it. Returns `calaId` for the command.
-* `list` - Lists out the contents of `~/.cala`, as well as updating any dead processes that weren't marked `Completed` to `Error`.
+* `list` - Updates any processes are no longer running but their status is still `Active` to `Error` and lists out all tasks in `~/.cala`.
 
 Cala does not provide built-in command to read the output of a command.  
 You can do it by reading `~/.cala/<id>.cala.output`
@@ -28,6 +28,11 @@ You can do it by removing `~/.cala/<id>.cala.output` and `~/.cala/<id>.cala` for
 or  
 you can simply do `rm -r ~/.cala` to clear all tracked processes and reset `calaId` to 0.  
 
+## Statuses
+Cala tasks can have one of three statuses
+- `Active` - The command is running
+- `Completed` - The command finished execution
+- `Error` - The process of the task is no longer running, but cala wasn't aware of it completion (can happen if you for example, shut down your system while a command is still running).
 
 ## Demo
 ![Peek 2023-01-06 15-47](https://user-images.githubusercontent.com/71319302/211035716-2a9831d3-6b86-4017-b210-85f452b8ff60.gif)
