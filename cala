@@ -3,7 +3,10 @@
 CALAPATH=$HOME/.cala
 
 usage() {
-  echo "cala"
+  echo "usage: cala <command>"
+  echo "available commands:"
+  echo "    add <command_to_run> - Executes specified command and starts tracking it. Returns calaId of the command"
+  echo "    list - Updates status of tasks that are no longer running but their status is still Active to Error and then lists out all tasks in ~/.cala"
 }
 
 ensurePath() {
